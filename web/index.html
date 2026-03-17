@@ -1,18 +1,38 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Inventory Dashboard</title>
+<title>Inventory Dashboard PRO</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
 <style>
 body { font-family: Arial; padding: 10px; background:#f5f5f5; }
+
+h2 { margin-bottom: 5px; }
+
+.kpi {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.kpi-card {
+    flex:1;
+    background:white;
+    padding:10px;
+    border-radius:10px;
+    text-align:center;
+    font-weight:bold;
+}
+
 .card {
     background:white;
     padding:10px;
     margin-bottom:10px;
     border-radius:10px;
+    cursor:pointer;
 }
+
 .green { color:green; }
 .red { color:red; }
 .yellow { color:orange; }
@@ -23,15 +43,27 @@ body { font-family: Arial; padding: 10px; background:#f5f5f5; }
 
 <h2>📊 Инвентаризация</h2>
 
+<div class="kpi">
+    <div class="kpi-card">Всего<br><span id="kpiTotal">0</span></div>
+    <div class="kpi-card green">Закрыто<br><span id="kpiClosed">0</span></div>
+    <div class="kpi-card yellow">В работе<br><span id="kpiProgress">0</span></div>
+    <div class="kpi-card red">Просрочено<br><span id="kpiOverdue">0</span></div>
+</div>
+
 <select id="filterAccountant"></select>
 <select id="filterTM"></select>
 <select id="filterStatus"></select>
 
+<h3>🔥 Проблемы</h3>
+<div id="problems"></div>
+
+<h3>📋 Все филиалы</h3>
 <div id="list"></div>
 
 <script>
 
 let DATA = [];
+let SUMMARY = {};
 
 async function load() {
 
@@ -39,9 +71,20 @@ async function load() {
     const json = await res.json();
 
     DATA = json.items || [];
+    SUMMARY = json.summary || {};
 
+    fillKPI();
     fillFilters();
+    renderProblems();
     render(DATA);
+}
+
+function fillKPI() {
+
+    document.getElementById("kpiTotal").innerText = SUMMARY.total || 0;
+    document.getElementById("kpiClosed").innerText = SUMMARY.closed || 0;
+    document.getElementById("kpiProgress").innerText = SUMMARY.in_progress || 0;
+    document.getElementById("kpiOverdue").innerText = SUMMARY.overdue || 0;
 }
 
 function fillFilters() {
@@ -77,9 +120,9 @@ function fillSelect(id, set) {
 
 function applyFilters() {
 
-    const acc = filterAccountant.value;
-    const tm = filterTM.value;
-    const status = filterStatus.value;
+    const acc = document.getElementById("filterAccountant").value;
+    const tm = document.getElementById("filterTM").value;
+    const status = document.getElementById("filterStatus").value;
 
     const filtered = DATA.filter(x => {
 
@@ -91,29 +134,54 @@ function applyFilters() {
     render(filtered);
 }
 
-function getColor(status) {
+function getColor(x) {
 
-    if (!status) return "";
+    if (x.is_overdue) return "red";
+    if (x.is_closed) return "green";
+    return "yellow";
+}
 
-    if (status.includes("Закрыто")) return "green";
-    if (status.includes("Осталось")) return "yellow";
-    if (status.includes("Просроч")) return "red";
+function sortData(arr) {
 
-    return "";
+    return arr.sort((a, b) => {
+
+        if (a.is_overdue !== b.is_overdue)
+            return b.is_overdue - a.is_overdue;
+
+        if (a.is_closed !== b.is_closed)
+            return a.is_closed - b.is_closed;
+
+        return (a.days || 0) - (b.days || 0);
+    });
+}
+
+function renderProblems() {
+
+    const overdue = DATA.filter(x => x.is_overdue);
+
+    let html = "";
+
+    overdue.forEach(x => {
+        html += `<div class="card red">${x.branch} — ПРОСРОЧЕНО</div>`;
+    });
+
+    document.getElementById("problems").innerHTML = html || "Нет проблем 🎉";
 }
 
 function render(data) {
 
     let html = "";
 
-    data.forEach(x => {
+    const sorted = sortData(data);
 
-        const color = getColor(x.status);
+    sorted.forEach(x => {
+
+        const color = getColor(x);
 
         html += `
         <div class="card" onclick="openDetail('${x.branch}')">
             <b>${x.branch}</b><br>
-            <span class="${color}">${x.status}</span><br>
+            <span class="${color}">${x.status_raw}</span><br>
             ${x.accountant} / ${x.tm}
         </div>
         `;
@@ -130,7 +198,8 @@ function openDetail(name) {
 `${x.branch}
 
 Итого: ${x.total}
-Статус: ${x.status}
+Статус: ${x.status_raw}
+Дней: ${x.days}
 
 Бухгалтер: ${x.accountant}
 ТМ: ${x.tm}`
