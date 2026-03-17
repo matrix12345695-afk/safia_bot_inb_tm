@@ -20,4 +20,4 @@ def get_dashboard():
 
 @app.get("/")
 def index():
-    return FileResponse("web/index.html")
+    return FileResponse("index.html")
