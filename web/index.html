@@ -1,0 +1,145 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Inventory Dashboard</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+<style>
+body { font-family: Arial; padding: 10px; background:#f5f5f5; }
+.card {
+    background:white;
+    padding:10px;
+    margin-bottom:10px;
+    border-radius:10px;
+}
+.green { color:green; }
+.red { color:red; }
+.yellow { color:orange; }
+</style>
+
+</head>
+<body>
+
+<h2>📊 Инвентаризация</h2>
+
+<select id="filterAccountant"></select>
+<select id="filterTM"></select>
+<select id="filterStatus"></select>
+
+<div id="list"></div>
+
+<script>
+
+let DATA = [];
+
+async function load() {
+
+    const res = await fetch("/dashboard");
+    const json = await res.json();
+
+    DATA = json.items || [];
+
+    fillFilters();
+    render(DATA);
+}
+
+function fillFilters() {
+
+    const accSet = new Set();
+    const tmSet = new Set();
+    const statusSet = new Set();
+
+    DATA.forEach(x => {
+        accSet.add(x.accountant);
+        tmSet.add(x.tm);
+        statusSet.add(x.status);
+    });
+
+    fillSelect("filterAccountant", accSet);
+    fillSelect("filterTM", tmSet);
+    fillSelect("filterStatus", statusSet);
+}
+
+function fillSelect(id, set) {
+
+    const el = document.getElementById(id);
+
+    el.innerHTML = "<option value=''>Все</option>";
+
+    set.forEach(v => {
+        if (v)
+            el.innerHTML += `<option>${v}</option>`;
+    });
+
+    el.onchange = applyFilters;
+}
+
+function applyFilters() {
+
+    const acc = filterAccountant.value;
+    const tm = filterTM.value;
+    const status = filterStatus.value;
+
+    const filtered = DATA.filter(x => {
+
+        return (!acc || x.accountant === acc)
+            && (!tm || x.tm === tm)
+            && (!status || x.status === status);
+    });
+
+    render(filtered);
+}
+
+function getColor(status) {
+
+    if (!status) return "";
+
+    if (status.includes("Закрыто")) return "green";
+    if (status.includes("Осталось")) return "yellow";
+    if (status.includes("Просроч")) return "red";
+
+    return "";
+}
+
+function render(data) {
+
+    let html = "";
+
+    data.forEach(x => {
+
+        const color = getColor(x.status);
+
+        html += `
+        <div class="card" onclick="openDetail('${x.branch}')">
+            <b>${x.branch}</b><br>
+            <span class="${color}">${x.status}</span><br>
+            ${x.accountant} / ${x.tm}
+        </div>
+        `;
+    });
+
+    document.getElementById("list").innerHTML = html;
+}
+
+function openDetail(name) {
+
+    const x = DATA.find(i => i.branch === name);
+
+    alert(
+`${x.branch}
+
+Итого: ${x.total}
+Статус: ${x.status}
+
+Бухгалтер: ${x.accountant}
+ТМ: ${x.tm}`
+    );
+}
+
+load();
+
+</script>
+
+</body>
+</html>
