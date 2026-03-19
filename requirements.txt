@@ -1,3 +1,2 @@
-pyTelegramBotAPI
-psutil
-pywin32
+fastapi
+uvicorn
