@@ -4,13 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Inventory Dashboard</title>
+<title>Inventory Dashboard PRO</title>
 
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-<link rel="stylesheet" href="/web/css/style.css">
-
+<link rel="stylesheet" href="/web/css/styles.css">
 </head>
+
 <body>
 
 <script>
@@ -27,6 +27,15 @@ if (window.Telegram?.WebApp) {
     <div class="kpi-card yellow">В работе<br><span id="kpiProgress">0</span></div>
     <div class="kpi-card red">Просрочено<br><span id="kpiOverdue">0</span></div>
 </div>
+
+<!-- 🔥 ПОДРАЗДЕЛЕНИЕ -->
+<select id="filterType">
+    <option value="">Все</option>
+    <option value="shop">Магазин</option>
+    <option value="bar">Бар</option>
+</select>
+
+<br>
 
 <select id="filterAccountant"></select>
 <select id="filterTM"></select>
