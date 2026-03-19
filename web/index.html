@@ -28,18 +28,33 @@ if (window.Telegram?.WebApp) {
     <div class="kpi-card red">Просрочено<br><span id="kpiOverdue">0</span></div>
 </div>
 
-<!-- 🔥 ПОДРАЗДЕЛЕНИЕ -->
-<select id="filterType">
-    <option value="">Все</option>
-    <option value="shop">Магазин</option>
-    <option value="bar">Бар</option>
-</select>
+<div class="filters">
 
-<br>
+    <div class="filter-block">
+        <label>Подразделение</label>
+        <select id="filterType">
+            <option value="">Все</option>
+            <option value="shop">Магазин</option>
+            <option value="bar">Бар</option>
+        </select>
+    </div>
 
-<select id="filterAccountant"></select>
-<select id="filterTM"></select>
-<select id="filterStatus"></select>
+    <div class="filter-block">
+        <label>Бухгалтер</label>
+        <select id="filterAccountant"></select>
+    </div>
+
+    <div class="filter-block">
+        <label>ТМ</label>
+        <select id="filterTM"></select>
+    </div>
+
+    <div class="filter-block">
+        <label>Статус</label>
+        <select id="filterStatus"></select>
+    </div>
+
+</div>
 
 <h3>🔥 Проблемы</h3>
 <div id="problems"></div>
