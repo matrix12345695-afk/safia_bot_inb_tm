@@ -3,7 +3,7 @@ let SUMMARY = {};
 
 async function load() {
     try {
-        const res = await fetch("/dashboard");
+        const res = await fetch(window.location.origin + "/dashboard");
         const json = await res.json();
 
         DATA = json.items || [];
@@ -15,7 +15,7 @@ async function load() {
         render(DATA);
 
     } catch (e) {
-        console.log("Œ¯Ë·Í‡ Á‡„ÛÁÍË", e);
+        console.log("–û—à–∏–±–∫–∞ –∑–∞–≥—Ä—É–∑–∫–∏", e);
     }
 }
 
@@ -26,7 +26,78 @@ function fillKPI() {
     document.getElementById("kpiOverdue").innerText = SUMMARY.overdue || 0;
 }
 
-// ?? ‡‚ÚÓÓ·ÌÓ‚ÎÂÌËÂ
+function fillFilters() {
+    const acc = [...new Set(DATA.map(i => i.accountant).filter(Boolean))];
+    const tm = [...new Set(DATA.map(i => i.tm).filter(Boolean))];
+
+    fillSelect("filterAccountant", acc);
+    fillSelect("filterTM", tm);
+    fillSelect("filterStatus", ["closed", "in_progress", "overdue"]);
+}
+
+function fillSelect(id, values) {
+    const el = document.getElementById(id);
+    el.innerHTML = '<option value="">–í—Å–µ</option>';
+
+    values.forEach(v => {
+        const o = document.createElement("option");
+        o.value = v;
+        o.textContent = v;
+        el.appendChild(o);
+    });
+
+    el.onchange = applyFilters;
+}
+
+function applyFilters() {
+    let filtered = DATA;
+
+    const acc = document.getElementById("filterAccountant").value;
+    const tm = document.getElementById("filterTM").value;
+    const st = document.getElementById("filterStatus").value;
+
+    if (acc) filtered = filtered.filter(i => i.accountant === acc);
+    if (tm) filtered = filtered.filter(i => i.tm === tm);
+    if (st) filtered = filtered.filter(i => i.status === st);
+
+    render(filtered);
+}
+
+function render(list) {
+    const container = document.getElementById("list");
+    container.innerHTML = "";
+
+    list.forEach(item => {
+        const div = document.createElement("div");
+        div.className = "card";
+
+        let status = item.status_raw || item.status;
+
+        div.innerHTML = `
+            <b>${item.branch}</b><br>
+            ${status}<br>
+            ${item.accountant || "-"} / ${item.tm || "-"}
+        `;
+
+        container.appendChild(div);
+    });
+}
+
+function renderProblems() {
+    const problems = DATA.filter(i => i.is_overdue);
+    const container = document.getElementById("problems");
+
+    if (!problems.length) {
+        container.innerHTML = "–ù–µ—Ç –ø—Ä–æ–±–ª–µ–º üéâ";
+        return;
+    }
+
+    container.innerHTML = problems.map(p =>
+        `<div class="card red">${p.branch}</div>`
+    ).join("");
+}
+
+// –∞–≤—Ç–æ–æ–±–Ω–æ–≤–ª–µ–Ω–∏–µ
 setInterval(load, 30000);
 
 load();
