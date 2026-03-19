@@ -1,56 +1,81 @@
 from fastapi import FastAPI, Request
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 import json
 import os
 
 app = FastAPI()
 
-# 📌 БАЗОВАЯ ПАПКА ПРОЕКТА (ВАЖНО ДЛЯ RENDER)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-DATA_FILE = os.path.join(BASE_DIR, "data", "dashboard.json")
+DATA_DIR = os.path.join(BASE_DIR, "data")
+WEB_DIR = os.path.join(BASE_DIR, "web")
+
+DATA_FILE = os.path.join(DATA_DIR, "dashboard.json")
 
 
-# 📊 ПОЛУЧЕНИЕ DASHBOARD
+# -----------------------
+# DASHBOARD GET
+# -----------------------
 @app.get("/dashboard")
 def get_dashboard():
-
-    if not os.path.exists(DATA_FILE):
-        return {"items": []}
-
     try:
+        if not os.path.exists(DATA_FILE):
+            return {"items": []}
+
         with open(DATA_FILE, "r", encoding="utf-8") as f:
             return json.load(f)
-    except:
+
+    except Exception as e:
+        print("❌ dashboard read error:", e)
         return {"items": []}
 
 
-# 🔥 ПРИЁМ ДАННЫХ ОТ БОТА
+# -----------------------
+# DASHBOARD UPDATE
+# -----------------------
 @app.post("/update_dashboard")
 async def update_dashboard(request: Request):
+    try:
+        data = await request.json()
 
-    data = await request.json()
+        os.makedirs(DATA_DIR, exist_ok=True)
 
-    os.makedirs(os.path.join(BASE_DIR, "data"), exist_ok=True)
+        with open(DATA_FILE, "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
 
-    with open(DATA_FILE, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
+        print("📊 Dashboard обновлён")
 
-    print("📊 Dashboard обновлён (Render)")
+        return {"status": "ok"}
 
-    return {"status": "ok"}
-
-
-# 🌐 СТАТИКА (JS / CSS)
-app.mount(
-    "/web",
-    StaticFiles(directory=os.path.join(BASE_DIR, "web")),
-    name="web"
-)
+    except Exception as e:
+        print("❌ update error:", e)
+        return {"status": "error"}
 
 
-# 🖥 ГЛАВНАЯ СТРАНИЦА
+# -----------------------
+# STATIC FILES
+# -----------------------
+try:
+    if os.path.exists(WEB_DIR):
+        app.mount("/web", StaticFiles(directory=WEB_DIR), name="web")
+except Exception as e:
+    print("❌ static mount error:", e)
+
+
+# -----------------------
+# INDEX
+# -----------------------
 @app.get("/")
 def index():
-    return FileResponse(os.path.join(BASE_DIR, "web", "index.html"))
+    try:
+        index_path = os.path.join(WEB_DIR, "index.html")
+
+        if os.path.exists(index_path):
+            return FileResponse(index_path)
+
+        return JSONResponse({"error": "index.html not found"})
+
+    except Exception as e:
+        print("❌ index error:", e)
+        return {"error": "server error"}
