@@ -1,5 +1,5 @@
 let DATA = [];
-let SUMMARY = [];
+let SUMMARY = {};
 
 async function load() {
     try {
@@ -19,7 +19,7 @@ async function load() {
     }
 }
 
-// KPI
+/* KPI */
 function fillKPI() {
     document.getElementById("kpiTotal").innerText = SUMMARY.total || 0;
     document.getElementById("kpiClosed").innerText = SUMMARY.closed || 0;
@@ -27,7 +27,7 @@ function fillKPI() {
     document.getElementById("kpiOverdue").innerText = SUMMARY.overdue || 0;
 }
 
-// ФИЛЬТРЫ
+/* ФИЛЬТРЫ */
 function fillFilters() {
     const acc = [...new Set(DATA.map(i => i.accountant).filter(Boolean))];
     const tm = [...new Set(DATA.map(i => i.tm).filter(Boolean))];
@@ -36,7 +36,11 @@ function fillFilters() {
     fillSelect("filterTM", tm);
     fillSelect("filterStatus", ["closed", "in_progress", "overdue"]);
 
-    document.getElementById("filterType").onchange = applyFilters;
+    document.getElementById("filterType").innerHTML = `
+        <option value="">Все</option>
+        <option value="shop">Магазин</option>
+        <option value="bar">Бар</option>
+    `;
 }
 
 function fillSelect(id, values) {
@@ -53,6 +57,7 @@ function fillSelect(id, values) {
     el.onchange = applyFilters;
 }
 
+/* ФИЛЬТР */
 function applyFilters() {
     let filtered = DATA;
 
@@ -61,14 +66,7 @@ function applyFilters() {
     const st = document.getElementById("filterStatus").value;
     const type = document.getElementById("filterType").value;
 
-    if (type === "shop") {
-        filtered = filtered.filter(i => i.type === "shop");
-    }
-
-    if (type === "bar") {
-        filtered = filtered.filter(i => i.type === "bar");
-    }
-
+    if (type) filtered = filtered.filter(i => i.type === type);
     if (acc) filtered = filtered.filter(i => i.accountant === acc);
     if (tm) filtered = filtered.filter(i => i.tm === tm);
     if (st) filtered = filtered.filter(i => i.status === st);
@@ -76,7 +74,7 @@ function applyFilters() {
     render(filtered);
 }
 
-// СПИСОК
+/* СПИСОК */
 function render(list) {
     const container = document.getElementById("list");
     container.innerHTML = "";
@@ -88,31 +86,35 @@ function render(list) {
         div.onclick = () => openDetails(item);
 
         div.innerHTML = `
-            <b>${item.branch}</b><br>
-            ${item.status_raw || item.status}<br>
-            ${item.accountant || "-"} / ${item.tm || "-"}
+            <div><b>${item.branch}</b></div>
+            <div class="status ${item.status}">
+                ${item.status_raw || item.status}
+            </div>
+            <div style="font-size:12px;color:#94a3b8">
+                ${item.accountant || "-"} / ${item.tm || "-"}
+            </div>
         `;
 
         container.appendChild(div);
     });
 }
 
-// ДЕТАЛКА (как Excel)
+/* ДЕТАЛИ */
 function openDetails(item) {
     const container = document.getElementById("list");
 
     if (!item.details || !item.details.length) {
         container.innerHTML = `
-            <button onclick="load()">⬅ Назад</button>
-            <p>Нет детальных данных</p>
+            <button onclick="load()">← Назад</button>
+            <p>Нет данных</p>
         `;
         return;
     }
 
-    let html = `<button onclick="load()">⬅ Назад</button>`;
+    let html = `<button onclick="load()">← Назад</button>`;
     html += `<h3>${item.branch}</h3>`;
 
-    html += `<table border="1" style="width:100%; font-size:12px;">
+    html += `<table>
         <tr>
             <th>Название</th>
             <th>Кол-во</th>
@@ -120,13 +122,13 @@ function openDetails(item) {
             <th>Сумма</th>
         </tr>`;
 
-    item.details.forEach(row => {
+    item.details.forEach(r => {
         html += `
         <tr>
-            <td>${row.name}</td>
-            <td>${row.qty}</td>
-            <td>${row.price}</td>
-            <td>${row.sum}</td>
+            <td>${r.name}</td>
+            <td>${r.qty}</td>
+            <td>${r.price}</td>
+            <td>${r.sum}</td>
         </tr>`;
     });
 
@@ -135,7 +137,7 @@ function openDetails(item) {
     container.innerHTML = html;
 }
 
-// ПРОБЛЕМЫ
+/* ПРОБЛЕМЫ */
 function renderProblems() {
     const problems = DATA.filter(i => i.is_overdue);
     const container = document.getElementById("problems");
@@ -150,7 +152,6 @@ function renderProblems() {
     ).join("");
 }
 
-// автообновление
+/* автообновление */
 setInterval(load, 30000);
-
 load();
