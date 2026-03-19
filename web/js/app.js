@@ -61,10 +61,17 @@ function applyFilters() {
     const st = document.getElementById("filterStatus").value;
     const type = document.getElementById("filterType").value;
 
+    if (type === "shop") {
+        filtered = filtered.filter(i => i.type === "shop");
+    }
+
+    if (type === "bar") {
+        filtered = filtered.filter(i => i.type === "bar");
+    }
+
     if (acc) filtered = filtered.filter(i => i.accountant === acc);
     if (tm) filtered = filtered.filter(i => i.tm === tm);
     if (st) filtered = filtered.filter(i => i.status === st);
-    if (type) filtered = filtered.filter(i => i.type === type);
 
     render(filtered);
 }
