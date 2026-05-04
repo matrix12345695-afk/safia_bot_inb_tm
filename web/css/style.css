@@ -5,24 +5,18 @@ body {
     color: #e2e8f0;
 }
 
-/* контейнер */
-.container {
-    max-width: 900px;
-    margin: auto;
-    padding: 12px;
+/* 🔥 HEADER */
+.header {
+    padding: 12px 16px;
+    border-bottom: 1px solid #1e293b;
 }
 
-/* заголовок */
-h1 {
-    font-size: 20px;
-    margin-bottom: 10px;
-}
-
-/* KPI */
+/* 🔥 KPI */
 .kpi {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 10px;
+    padding: 12px 16px;
 }
 
 .kpi-card {
@@ -37,19 +31,15 @@ h1 {
     transform: translateY(-2px);
 }
 
-.kpi-value {
-    font-size: 18px;
-    font-weight: bold;
-}
-
 .green { color: #22c55e; }
 .red { color: #ef4444; }
 .yellow { color: #f59e0b; }
 
-/* фильтры */
+/* 🔥 FILTERS */
 .filters {
-    margin-top: 15px;
+    padding: 0 16px 12px 16px;
     display: grid;
+    grid-template-columns: repeat(4, 1fr);
     gap: 10px;
 }
 
@@ -72,66 +62,79 @@ select {
     color: white;
 }
 
-/* карточки */
+/* =========================
+   🔥 MAIN LAYOUT (как Sheets)
+========================= */
+
+.main {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    height: calc(100vh - 180px);
+}
+
+/* 🔥 SIDEBAR */
+.sidebar {
+    border-right: 1px solid #1e293b;
+    overflow-y: auto;
+    padding: 12px;
+}
+
+/* 🔥 CONTENT (ТАБЛИЦА) */
+.content {
+    overflow: auto;
+    padding: 12px;
+}
+
+/* =========================
+   🔥 КАРТОЧКИ
+========================= */
+
 .card {
     background: #1e293b;
     padding: 12px;
     margin-top: 10px;
     border-radius: 12px;
     transition: 0.2s;
-    cursor: pointer;
+    cursor: default;
+    border: 1px solid #334155;
 }
 
 .card:hover {
-    transform: scale(1.02);
+    transform: translateY(-2px);
+    border-color: #475569;
 }
 
-/* статус */
-.status {
-    font-size: 13px;
-    margin-top: 5px;
-}
+/* =========================
+   🔥 КНОПКИ
+========================= */
 
-.status.closed { color: #22c55e; }
-.status.in_progress { color: #f59e0b; }
-.status.overdue { color: #ef4444; }
-
-/* кнопка */
 button {
-    margin-bottom: 10px;
-    padding: 8px 12px;
+    padding: 6px 10px;
     border-radius: 8px;
     border: none;
     background: #334155;
     color: white;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #475569;
 }
 
 /* =========================
-   🔥 EXCEL UI 1:1
+   🔥 EXCEL TABLE (как Sheets)
 ========================= */
 
-/* контейнер Excel */
 #excelTable {
     overflow: auto;
-    max-height: 70vh;
-    border: 1px solid #334155;
-    border-radius: 10px;
-    background: #0f172a;
-    padding: 10px;
+    max-height: 100%;
 }
 
-/* 🔥 ДВЕ ТАБЛИЦЫ КАК В EXCEL */
+/* две таблицы */
 .excel-wrapper {
-    display: flex;
-    gap: 24px;
-    align-items: flex-start;
-}
-
-/* левая и правая части */
-.excel-left,
-.excel-right {
-    flex: 1;
-    overflow-x: auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
 }
 
 /* таблица */
@@ -161,13 +164,21 @@ button {
     background: #e2e8f0;
 }
 
-/* закреп шапки */
+/* 🔥 закреп шапки */
 .excel-table tr:first-child td {
     position: sticky;
     top: 0;
     background: #e5e7eb;
     font-weight: bold;
     z-index: 2;
+}
+
+/* 🔥 фикс первой колонки (Sheets эффект) */
+.excel-table td:first-child {
+    position: sticky;
+    left: 0;
+    background: #f1f5f9;
+    z-index: 1;
 }
 
 /* скролл */
