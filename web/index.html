@@ -20,12 +20,12 @@ if (window.Telegram?.WebApp) {
 }
 </script>
 
-<!-- 🔥 HEADER -->
+<!-- HEADER -->
 <div class="header">
     <h2>📊 Инвентаризация</h2>
 </div>
 
-<!-- 🔥 KPI -->
+<!-- KPI -->
 <div class="kpi">
     <div class="kpi-card">Всего<br><span id="kpiTotal">0</span></div>
     <div class="kpi-card green">Закрыто<br><span id="kpiClosed">0</span></div>
@@ -33,7 +33,7 @@ if (window.Telegram?.WebApp) {
     <div class="kpi-card red">Просрочено<br><span id="kpiOverdue">0</span></div>
 </div>
 
-<!-- 🔥 FILTERS -->
+<!-- FILTERS -->
 <div class="filters">
     <div class="filter-block">
         <label>Подразделение</label>
@@ -56,10 +56,10 @@ if (window.Telegram?.WebApp) {
     </div>
 </div>
 
-<!-- 🔥 MAIN LAYOUT -->
+<!-- MAIN -->
 <div class="main">
 
-    <!-- ЛЕВАЯ ПАНЕЛЬ -->
+    <!-- SIDEBAR -->
     <div class="sidebar">
 
         <h3>🔥 Проблемы</h3>
@@ -70,11 +70,16 @@ if (window.Telegram?.WebApp) {
 
     </div>
 
-    <!-- ПРАВАЯ ПАНЕЛЬ (ТАБЛИЦА) -->
+    <!-- CONTENT -->
     <div class="content">
-        <div id="tableView">
-            <p style="color:#94a3b8">Выбери филиал →</p>
+
+        <!-- 🔥 ЗДЕСЬ ВСЕГДА ТОЛЬКО ТАБЛИЦА -->
+        <div id="tableView" class="table-view">
+            <div class="empty-state">
+                Выбери филиал →
+            </div>
         </div>
+
     </div>
 
 </div>
