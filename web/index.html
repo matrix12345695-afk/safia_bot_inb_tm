@@ -72,16 +72,21 @@ if (window.Telegram?.WebApp) {
 
     <!-- CONTENT -->
     <div class="content">
-
-        <!-- 🔥 ЗДЕСЬ ВСЕГДА ТОЛЬКО ТАБЛИЦА -->
         <div id="tableView" class="table-view">
             <div class="empty-state">
                 Выбери филиал →
             </div>
         </div>
-
     </div>
 
+</div>
+
+<!-- 🔥 МОДАЛЬНОЕ ОКНО (НОВОЕ ОКНО ДЛЯ EXCEL) -->
+<div id="modal" class="modal hidden">
+    <div class="modal-content">
+        <button class="close-btn" onclick="closeModal()">✕</button>
+        <div id="modalBody"></div>
+    </div>
 </div>
 
 <script src="/web/js/app.js"></script>
