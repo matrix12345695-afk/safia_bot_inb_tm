@@ -107,52 +107,62 @@ button {
 }
 
 /* =========================
-   🔥 EXCEL UI (СТАБИЛЬНЫЙ)
+   🔥 EXCEL UI 1:1
 ========================= */
 
-/* контейнер */
+/* контейнер Excel */
 #excelTable {
     overflow: auto;
     max-height: 70vh;
     border: 1px solid #334155;
     border-radius: 10px;
     background: #0f172a;
-    padding: 6px;
+    padding: 10px;
 }
 
-/* таблица — фикс сетка */
-#excelTable table {
+/* 🔥 ДВЕ ТАБЛИЦЫ КАК В EXCEL */
+.excel-wrapper {
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+}
+
+/* левая и правая части */
+.excel-left,
+.excel-right {
+    flex: 1;
+    overflow-x: auto;
+}
+
+/* таблица */
+.excel-table {
     border-collapse: collapse;
-    table-layout: fixed; /* 🔥 КЛЮЧЕВОЕ */
-    width: 100%;
+    font-size: 13px;
     background: white;
     color: black;
-    font-size: 13px;
+    width: max-content;
+    min-width: 100%;
 }
 
 /* ячейки */
-#excelTable td,
-#excelTable th {
+.excel-table td {
     border: 1px solid #d1d5db;
     padding: 6px;
-
-    overflow: hidden;
-    text-overflow: ellipsis;
     white-space: nowrap;
 }
 
 /* зебра */
-#excelTable tr:nth-child(even) td {
+.excel-table tr:nth-child(even) td {
     background: #f8fafc;
 }
 
 /* hover */
-#excelTable tr:hover td {
-    background: #e2e8f0 !important;
+.excel-table tr:hover td {
+    background: #e2e8f0;
 }
 
-/* шапка */
-#excelTable tr:first-child td {
+/* закреп шапки */
+.excel-table tr:first-child td {
     position: sticky;
     top: 0;
     background: #e5e7eb;
