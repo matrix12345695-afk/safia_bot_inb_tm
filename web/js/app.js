@@ -1,71 +1,151 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+let DATA = [];
+let SUMMARY = {};
 
-<title>Inventory Dashboard PRO</title>
+async function load() {
+    try {
+        const res = await fetch(window.location.origin + "/dashboard");
+        const json = await res.json();
 
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
+        DATA = json.items || [];
+        SUMMARY = json.summary || {};
 
-<!-- ✅ ДОБАВИЛ -->
-<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+        fillKPI();
+        fillFilters();
+        renderProblems();
+        render(DATA);
 
-<link rel="stylesheet" href="/web/css/styles.css">
-</head>
-
-<body>
-
-<script>
-if (window.Telegram?.WebApp) {
-    Telegram.WebApp.expand();
+    } catch (e) {
+        console.log("Ошибка загрузки", e);
+    }
 }
-</script>
 
-<h2>📊 Инвентаризация</h2>
+/* KPI */
+function fillKPI() {
+    document.getElementById("kpiTotal").innerText = SUMMARY.total || 0;
+    document.getElementById("kpiClosed").innerText = SUMMARY.closed || 0;
+    document.getElementById("kpiProgress").innerText = SUMMARY.in_progress || 0;
+    document.getElementById("kpiOverdue").innerText = SUMMARY.overdue || 0;
+}
 
-<div class="kpi">
-    <div class="kpi-card">Всего<br><span id="kpiTotal">0</span></div>
-    <div class="kpi-card green">Закрыто<br><span id="kpiClosed">0</span></div>
-    <div class="kpi-card yellow">В работе<br><span id="kpiProgress">0</span></div>
-    <div class="kpi-card red">Просрочено<br><span id="kpiOverdue">0</span></div>
-</div>
+/* ФИЛЬТРЫ */
+function fillFilters() {
+    const acc = [...new Set(DATA.map(i => i.accountant).filter(Boolean))];
+    const tm = [...new Set(DATA.map(i => i.tm).filter(Boolean))];
 
-<div class="filters">
+    fillSelect("filterAccountant", acc);
+    fillSelect("filterTM", tm);
+    fillSelect("filterStatus", ["closed", "in_progress", "overdue"]);
 
-    <div class="filter-block">
-        <label>Подразделение</label>
-        <select id="filterType">
-            <option value="">Все</option>
-            <option value="shop">Магазин</option>
-            <option value="bar">Бар</option>
-        </select>
-    </div>
+    document.getElementById("filterType").innerHTML = `
+        <option value="">Все</option>
+        <option value="shop">Магазин</option>
+        <option value="bar">Бар</option>
+    `;
+}
 
-    <div class="filter-block">
-        <label>Бухгалтер</label>
-        <select id="filterAccountant"></select>
-    </div>
+function fillSelect(id, values) {
+    const el = document.getElementById(id);
+    el.innerHTML = '<option value="">Все</option>';
 
-    <div class="filter-block">
-        <label>ТМ</label>
-        <select id="filterTM"></select>
-    </div>
+    values.forEach(v => {
+        const o = document.createElement("option");
+        o.value = v;
+        o.textContent = v;
+        el.appendChild(o);
+    });
 
-    <div class="filter-block">
-        <label>Статус</label>
-        <select id="filterStatus"></select>
-    </div>
+    el.onchange = applyFilters;
+}
 
-</div>
+/* ФИЛЬТР */
+function applyFilters() {
+    let filtered = DATA;
 
-<h3>🔥 Проблемы</h3>
-<div id="problems"></div>
+    const acc = document.getElementById("filterAccountant").value;
+    const tm = document.getElementById("filterTM").value;
+    const st = document.getElementById("filterStatus").value;
+    const type = document.getElementById("filterType").value;
 
-<h3>📋 Все филиалы</h3>
-<div id="list"></div>
+    if (type) filtered = filtered.filter(i => i.type === type);
+    if (acc) filtered = filtered.filter(i => i.accountant === acc);
+    if (tm) filtered = filtered.filter(i => i.tm === tm);
+    if (st) filtered = filtered.filter(i => i.status === st);
 
-<script src="/web/js/app.js"></script>
+    render(filtered);
+}
 
-</body>
-</html>
+/* СПИСОК */
+function render(list) {
+    const container = document.getElementById("list");
+    container.innerHTML = "";
+
+    list.forEach(item => {
+        const div = document.createElement("div");
+        div.className = "card";
+
+        div.onclick = () => openDetails(item);
+
+        div.innerHTML = `
+            <div><b>${item.branch}</b></div>
+            <div class="status ${item.status}">
+                ${item.status_raw || item.status}
+            </div>
+            <div style="font-size:12px;color:#94a3b8">
+                ${item.accountant || "-"} / ${item.tm || "-"}
+            </div>
+        `;
+
+        container.appendChild(div);
+    });
+}
+
+/* ДЕТАЛИ — ПЕРЕПИСАНО ПОЛНОСТЬЮ */
+async function openDetails(item) {
+    const container = document.getElementById("list");
+
+    container.innerHTML = `
+        <button onclick="load()">← Назад</button>
+        <h3>${item.branch}</h3>
+        <div id="excelTable">Загрузка Excel...</div>
+    `;
+
+    try {
+        const response = await fetch("/excel/Май бар №1.xlsm"); // путь к файлу
+        const data = await response.arrayBuffer();
+
+        const workbook = XLSX.read(data, {
+            type: "array",
+            cellStyles: true
+        });
+
+        // ⚠️ если нужный лист не первый — поменяй индекс
+        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+
+        const html = XLSX.utils.sheet_to_html(sheet);
+
+        document.getElementById("excelTable").innerHTML = html;
+
+    } catch (e) {
+        console.log(e);
+        document.getElementById("excelTable").innerHTML = "Ошибка загрузки Excel";
+    }
+}
+
+/* ПРОБЛЕМЫ */
+function renderProblems() {
+    const problems = DATA.filter(i => i.is_overdue);
+    const container = document.getElementById("problems");
+
+    if (!problems.length) {
+        container.innerHTML = "Нет проблем 🎉";
+        return;
+    }
+
+    container.innerHTML = problems.map(p =>
+        `<div class="card red">${p.branch}</div>`
+    ).join("");
+}
+
+/* автообновление */
+setInterval(load, 30000);
+load();
