@@ -136,3 +136,70 @@ button {
 #excelTable tr:nth-child(even) {
     background: #f9f9f9;
 }
+/* =========================
+   🔥 EXCEL UI (УЛУЧШЕННЫЙ)
+========================= */
+
+/* контейнер Excel */
+#excelTable {
+    overflow: auto;
+    max-height: 70vh;
+    border: 1px solid #334155;
+    border-radius: 10px;
+    background: #0f172a;
+    padding: 6px;
+}
+
+/* сама таблица */
+#excelTable table,
+.excel-table {
+    border-collapse: collapse;
+    width: max-content;
+    min-width: 100%;
+    font-size: 13px;
+    background: white;
+    color: black;
+}
+
+/* ячейки */
+#excelTable td,
+#excelTable th,
+.excel-table td {
+    border: 1px solid #d1d5db;
+    padding: 6px;
+    white-space: nowrap;
+}
+
+/* зебра как в Excel */
+#excelTable tr:nth-child(even) td {
+    background: #f8fafc;
+}
+
+/* hover как в таблицах BI */
+#excelTable tr:hover td {
+    background: #e2e8f0 !important;
+}
+
+/* закреп шапки (если первая строка = заголовок) */
+#excelTable tr:first-child td {
+    position: sticky;
+    top: 0;
+    background: #e5e7eb;
+    font-weight: bold;
+    z-index: 2;
+}
+
+/* скролл красивый */
+#excelTable::-webkit-scrollbar {
+    height: 10px;
+    width: 10px;
+}
+
+#excelTable::-webkit-scrollbar-thumb {
+    background: #475569;
+    border-radius: 6px;
+}
+
+#excelTable::-webkit-scrollbar-track {
+    background: #1e293b;
+}
