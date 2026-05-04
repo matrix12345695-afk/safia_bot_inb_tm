@@ -10,6 +10,7 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 DATA_DIR = os.path.join(BASE_DIR, "data")
 WEB_DIR = os.path.join(BASE_DIR, "web")
+EXCEL_DIR = os.path.join(BASE_DIR, "excel")  # 👈 ДОБАВИЛ
 
 DATA_FILE = os.path.join(DATA_DIR, "dashboard.json")
 
@@ -51,6 +52,28 @@ async def update_dashboard(request: Request):
     except Exception as e:
         print("❌ update error:", e)
         return {"status": "error"}
+
+
+# -----------------------
+# 🔥 EXCEL ENDPOINT (НОВОЕ)
+# -----------------------
+@app.get("/excel")
+def get_excel():
+    try:
+        file_path = os.path.join(EXCEL_DIR, "Май бар №1.xlsm")
+
+        if not os.path.exists(file_path):
+            return JSONResponse({"error": "Excel file not found"})
+
+        return FileResponse(
+            file_path,
+            media_type="application/vnd.ms-excel",
+            filename="Май бар №1.xlsm"
+        )
+
+    except Exception as e:
+        print("❌ excel error:", e)
+        return JSONResponse({"error": "excel error"})
 
 
 # -----------------------
