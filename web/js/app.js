@@ -141,7 +141,13 @@ function openDetails(index) {
     }
 
     body.innerHTML = html;
+
+    // 💥 АНИМАЦИЯ
     modal.classList.remove("hidden");
+
+    setTimeout(() => {
+        modal.classList.add("show");
+    }, 10);
 }
 
 /* 🔙 ЗАКРЫТИЕ */
