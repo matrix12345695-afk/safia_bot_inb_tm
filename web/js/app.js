@@ -164,8 +164,7 @@ function closeModal() {
 
     setTimeout(() => {
         modal.classList.add("hidden");
-        currentView = "list";
-    }, 250);
+    }, 300);
 }
 
 /* ПРОБЛЕМЫ */
