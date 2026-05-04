@@ -152,8 +152,14 @@ function openDetails(index) {
 
 /* 🔙 ЗАКРЫТИЕ */
 function closeModal() {
-    currentView = "list";
-    document.getElementById("modal").classList.add("hidden");
+    const modal = document.getElementById("modal");
+
+    modal.classList.remove("show");
+
+    setTimeout(() => {
+        modal.classList.add("hidden");
+        currentView = "list";
+    }, 250);
 }
 
 /* ПРОБЛЕМЫ */
