@@ -2,6 +2,9 @@ let DATA = [];
 let SUMMARY = {};
 let currentView = "list";
 
+let isMouseDown = false;
+let selectedCells = [];
+
 // API
 const API_URL = window.location.origin;
 
@@ -86,7 +89,7 @@ function formatMoney(num) {
     return Number(num).toLocaleString("ru-RU");
 }
 
-/* 🚀 ГЛАВНЫЙ ЭКРАН (ПЕРЕДЕЛАН) */
+/* 🚀 ГЛАВНЫЙ ЭКРАН */
 function render(list) {
     const container = document.getElementById("list");
     container.innerHTML = "";
@@ -139,7 +142,7 @@ function render(list) {
 function openDetails(item) {
     currentView = "details";
 
-    const container = document.getElementById("list");
+    const container = document.getElementById("tableView"); // 🔥 ВАЖНО
 
     let html = `<button onclick="goBack()">← Назад</button>`;
     html += `<h3>${item.branch}</h3>`;
@@ -161,13 +164,14 @@ function openDetails(item) {
 
     container.innerHTML = html;
 
-    setTimeout(enableCellClick, 100);
+    setTimeout(enableExcelSelection, 100);
 }
 
 /* 🔙 НАЗАД */
 function goBack() {
     currentView = "list";
     load();
+    document.getElementById("tableView").innerHTML = "Выбери филиал →";
 }
 
 /* 🔍 ПОИСК */
@@ -181,16 +185,45 @@ function filterExcelTable() {
     });
 }
 
-/* 🟦 КЛИК ПО ЯЧЕЙКЕ */
-function enableCellClick() {
+/* 🔥 ВЫДЕЛЕНИЕ КАК В EXCEL */
+function enableExcelSelection() {
     const cells = document.querySelectorAll("#excelTable td");
 
     cells.forEach(cell => {
-        cell.onclick = () => {
-            document.querySelectorAll("#excelTable td").forEach(c => c.style.outline = "none");
-            cell.style.outline = "2px solid #3b82f6";
+
+        cell.onmousedown = () => {
+            isMouseDown = true;
+            clearSelection();
+            selectCell(cell);
+        };
+
+        cell.onmouseover = () => {
+            if (isMouseDown) selectCell(cell);
         };
     });
+
+    document.onmouseup = () => {
+        isMouseDown = false;
+    };
+
+    document.oncopy = (e) => {
+        if (!selectedCells.length) return;
+
+        const text = selectedCells.map(c => c.innerText).join("\t");
+
+        e.clipboardData.setData("text/plain", text);
+        e.preventDefault();
+    };
+}
+
+function selectCell(cell) {
+    cell.style.background = "#93c5fd";
+    selectedCells.push(cell);
+}
+
+function clearSelection() {
+    selectedCells.forEach(c => c.style.background = "");
+    selectedCells = [];
 }
 
 /* ПРОБЛЕМЫ */
