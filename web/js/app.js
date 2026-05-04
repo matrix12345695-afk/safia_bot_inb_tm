@@ -1,10 +1,14 @@
 let DATA = [];
 let SUMMARY = {};
+let currentView = "list"; // 🔥 фикс состояния
 
 // API
 const API_URL = window.location.origin;
 
 async function load() {
+    // ❗ НЕ обновляем если открыт лист
+    if (currentView !== "list") return;
+
     try {
         const res = await fetch(API_URL + "/dashboard");
         const json = await res.json();
@@ -77,7 +81,7 @@ function applyFilters() {
     render(filtered);
 }
 
-/* СПИСОК */
+/* СПИСОК — С КНОПКОЙ */
 function render(list) {
     const container = document.getElementById("list");
     container.innerHTML = "";
@@ -86,15 +90,29 @@ function render(list) {
         const div = document.createElement("div");
         div.className = "card";
 
-        div.onclick = () => openDetails(item);
-
         div.innerHTML = `
-            <div><b>${item.branch}</b></div>
-            <div class="status ${item.status}">
-                ${item.status_raw || item.status}
-            </div>
-            <div style="font-size:12px;color:#94a3b8">
-                ${item.accountant || "-"} / ${item.tm || "-"}
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+                
+                <div>
+                    <div><b>${item.branch}</b></div>
+
+                    <div class="status ${item.status}">
+                        ${item.status_raw || item.status}
+                    </div>
+
+                    <div style="font-size:12px;color:#94a3b8">
+                        ${item.accountant || "-"} / ${item.tm || "-"}
+                    </div>
+
+                    <div style="margin-top:4px;font-size:13px;color:#38bdf8">
+                        💰 ${item.total || 0}
+                    </div>
+                </div>
+
+                <button onclick='openDetails(${JSON.stringify(item)})'>
+                    Открыть →
+                </button>
+
             </div>
         `;
 
@@ -102,11 +120,13 @@ function render(list) {
     });
 }
 
-/* 🔥 EXCEL UI + ПОИСК + КЛИК */
+/* 🔥 ДЕТАЛИ */
 function openDetails(item) {
+    currentView = "details"; // ❗ фикс
+
     const container = document.getElementById("list");
 
-    let html = `<button onclick="load()">← Назад</button>`;
+    let html = `<button onclick="goBack()">← Назад</button>`;
     html += `<h3>${item.branch}</h3>`;
 
     if (!item.excel_html) {
@@ -127,6 +147,12 @@ function openDetails(item) {
     container.innerHTML = html;
 
     setTimeout(enableCellClick, 100);
+}
+
+/* 🔙 НАЗАД */
+function goBack() {
+    currentView = "list";
+    load();
 }
 
 /* 🔍 ПОИСК */
