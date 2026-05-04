@@ -102,7 +102,7 @@ function render(list) {
     });
 }
 
-/* 🔥 НОВАЯ ВЕРСИЯ — БЕЗ /excel */
+/* 🔥 EXCEL UI + ПОИСК + КЛИК */
 function openDetails(item) {
     const container = document.getElementById("list");
 
@@ -112,10 +112,44 @@ function openDetails(item) {
     if (!item.excel_html) {
         html += "<p>Нет данных</p>";
     } else {
-        html += `<div id="excelTable">${item.excel_html}</div>`;
+        html += `
+            <input 
+                type="text" 
+                id="excelSearch" 
+                placeholder="🔍 Поиск..." 
+                style="margin-bottom:10px;padding:6px;border-radius:6px;border:none;width:100%;"
+                onkeyup="filterExcelTable()"
+            />
+            <div id="excelTable">${item.excel_html}</div>
+        `;
     }
 
     container.innerHTML = html;
+
+    setTimeout(enableCellClick, 100);
+}
+
+/* 🔍 ПОИСК */
+function filterExcelTable() {
+    const input = document.getElementById("excelSearch").value.toLowerCase();
+    const rows = document.querySelectorAll("#excelTable table tr");
+
+    rows.forEach(row => {
+        const text = row.innerText.toLowerCase();
+        row.style.display = text.includes(input) ? "" : "none";
+    });
+}
+
+/* 🟦 КЛИК ПО ЯЧЕЙКЕ */
+function enableCellClick() {
+    const cells = document.querySelectorAll("#excelTable td");
+
+    cells.forEach(cell => {
+        cell.onclick = () => {
+            document.querySelectorAll("#excelTable td").forEach(c => c.style.outline = "none");
+            cell.style.outline = "2px solid #3b82f6";
+        };
+    });
 }
 
 /* ПРОБЛЕМЫ */
