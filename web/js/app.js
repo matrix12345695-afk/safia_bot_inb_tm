@@ -94,43 +94,31 @@ function render(list) {
     const container = document.getElementById("list");
     container.innerHTML = "";
 
-    list.forEach(item => {
+    list.forEach((item, index) => {
         const div = document.createElement("div");
         div.className = "card";
-
-        const statusColor =
-            item.status === "closed" ? "#22c55e" :
-            item.status === "overdue" ? "#ef4444" :
-            "#f59e0b";
 
         div.innerHTML = `
             <div style="display:flex;justify-content:space-between;align-items:center;">
                 
                 <div>
-                    <div style="font-size:16px;font-weight:600;">
-                        ${item.branch}
-                    </div>
-
-                    <div style="margin-top:4px;color:${statusColor};font-size:13px;">
-                        ● ${item.status_raw || item.status}
-                    </div>
-
-                    <div style="margin-top:6px;font-size:12px;color:#94a3b8;">
-                        ${item.accountant || "-"} / ${item.tm || "-"}
+                    <div style="font-weight:600">${item.branch}</div>
+                    <div style="font-size:12px;color:#94a3b8">
+                        ${item.status_raw || ""}
                     </div>
                 </div>
 
-                <div style="text-align:right;">
-                    <div style="font-size:16px;font-weight:bold;color:#38bdf8;">
+                <div style="display:flex;align-items:center;gap:10px;">
+                    
+                    <div style="font-weight:bold;color:#38bdf8">
                         ${formatMoney(item.total)}
                     </div>
 
-                    <button style="margin-top:6px"
-                        onclick='openDetails(${JSON.stringify(item)})'>
-                        Открыть →
+                    <button onclick="openDetails(${index})">
+                        →
                     </button>
-                </div>
 
+                </div>
             </div>
         `;
 
@@ -138,33 +126,23 @@ function render(list) {
     });
 }
 
-/* 🔥 ДЕТАЛИ */
-function openDetails(item) {
+/* 🔥 ОТКРЫТИЕ ЛИСТА */
+function openDetails(index) {
     currentView = "details";
 
-    const container = document.getElementById("tableView"); // 🔥 ВАЖНО
+    const item = DATA[index];
 
-    let html = `<button onclick="goBack()">← Назад</button>`;
-    html += `<h3>${item.branch}</h3>`;
+    const container = document.getElementById("tableView");
+
+    let html = `<h3>${item.branch}</h3>`;
 
     if (!item.excel_html) {
         html += "<p>Нет данных</p>";
     } else {
-        html += `
-            <input 
-                type="text" 
-                id="excelSearch" 
-                placeholder="🔍 Поиск..." 
-                style="margin-bottom:10px;padding:6px;border-radius:6px;border:none;width:100%;"
-                onkeyup="filterExcelTable()"
-            />
-            <div id="excelTable">${item.excel_html}</div>
-        `;
+        html += `<div id="excelTable">${item.excel_html}</div>`;
     }
 
     container.innerHTML = html;
-
-    setTimeout(enableExcelSelection, 100);
 }
 
 /* 🔙 НАЗАД */
@@ -172,58 +150,6 @@ function goBack() {
     currentView = "list";
     load();
     document.getElementById("tableView").innerHTML = "Выбери филиал →";
-}
-
-/* 🔍 ПОИСК */
-function filterExcelTable() {
-    const input = document.getElementById("excelSearch").value.toLowerCase();
-    const rows = document.querySelectorAll("#excelTable table tr");
-
-    rows.forEach(row => {
-        const text = row.innerText.toLowerCase();
-        row.style.display = text.includes(input) ? "" : "none";
-    });
-}
-
-/* 🔥 ВЫДЕЛЕНИЕ КАК В EXCEL */
-function enableExcelSelection() {
-    const cells = document.querySelectorAll("#excelTable td");
-
-    cells.forEach(cell => {
-
-        cell.onmousedown = () => {
-            isMouseDown = true;
-            clearSelection();
-            selectCell(cell);
-        };
-
-        cell.onmouseover = () => {
-            if (isMouseDown) selectCell(cell);
-        };
-    });
-
-    document.onmouseup = () => {
-        isMouseDown = false;
-    };
-
-    document.oncopy = (e) => {
-        if (!selectedCells.length) return;
-
-        const text = selectedCells.map(c => c.innerText).join("\t");
-
-        e.clipboardData.setData("text/plain", text);
-        e.preventDefault();
-    };
-}
-
-function selectCell(cell) {
-    cell.style.background = "#93c5fd";
-    selectedCells.push(cell);
-}
-
-function clearSelection() {
-    selectedCells.forEach(c => c.style.background = "");
-    selectedCells = [];
 }
 
 /* ПРОБЛЕМЫ */
