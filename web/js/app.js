@@ -1,5 +1,5 @@
 let DATA = [];
-let SUMMARY = [];
+let SUMMARY = {};
 let currentView = "list";
 
 // API
@@ -86,7 +86,7 @@ function formatMoney(num) {
     return Number(num).toLocaleString("ru-RU");
 }
 
-/* 🚀 СПИСОК ФИЛИАЛОВ */
+/* 🚀 СПИСОК */
 function render(list) {
     const container = document.getElementById("list");
     container.innerHTML = "";
@@ -123,7 +123,7 @@ function render(list) {
     });
 }
 
-/* 🔥 ОТКРЫТИЕ В МОДАЛКЕ */
+/* 🔥 ОТКРЫТИЕ МОДАЛКИ */
 function openDetails(index) {
     const item = DATA[index];
 
@@ -140,7 +140,6 @@ function openDetails(index) {
 
     body.innerHTML = html;
 
-    // 🔥 правильное открытие
     modal.classList.remove("hidden");
 
     setTimeout(() => {
@@ -148,25 +147,7 @@ function openDetails(index) {
     }, 10);
 }
 
-    body.innerHTML = html;
-
-    // 💥 ЖЁСТКИЙ СТАРТ
-    modal.classList.remove("hidden");
-    modal.offsetHeight; // 🔥 форс рендер
-    modal.classList.add("show");
-}
-
-    body.innerHTML = html;
-
-    // 💥 АНИМАЦИЯ
-    modal.classList.remove("hidden");
-
-    setTimeout(() => {
-        modal.classList.add("show");
-    }, 10);
-}
-
-/* 🔙 ЗАКРЫТИЕ */
+/* ❌ ЗАКРЫТЬ */
 function closeModal() {
     const modal = document.getElementById("modal");
 
