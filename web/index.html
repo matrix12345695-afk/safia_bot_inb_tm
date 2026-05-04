@@ -7,8 +7,6 @@
 <title>Inventory Dashboard PRO</title>
 
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-
-<!-- ✅ ДОБАВИЛ -->
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 
 <link rel="stylesheet" href="/web/css/styles.css">
@@ -22,8 +20,12 @@ if (window.Telegram?.WebApp) {
 }
 </script>
 
-<h2>📊 Инвентаризация</h2>
+<!-- 🔥 HEADER -->
+<div class="header">
+    <h2>📊 Инвентаризация</h2>
+</div>
 
+<!-- 🔥 KPI -->
 <div class="kpi">
     <div class="kpi-card">Всего<br><span id="kpiTotal">0</span></div>
     <div class="kpi-card green">Закрыто<br><span id="kpiClosed">0</span></div>
@@ -31,15 +33,11 @@ if (window.Telegram?.WebApp) {
     <div class="kpi-card red">Просрочено<br><span id="kpiOverdue">0</span></div>
 </div>
 
+<!-- 🔥 FILTERS -->
 <div class="filters">
-
     <div class="filter-block">
         <label>Подразделение</label>
-        <select id="filterType">
-            <option value="">Все</option>
-            <option value="shop">Магазин</option>
-            <option value="bar">Бар</option>
-        </select>
+        <select id="filterType"></select>
     </div>
 
     <div class="filter-block">
@@ -56,14 +54,30 @@ if (window.Telegram?.WebApp) {
         <label>Статус</label>
         <select id="filterStatus"></select>
     </div>
-
 </div>
 
-<h3>🔥 Проблемы</h3>
-<div id="problems"></div>
+<!-- 🔥 MAIN LAYOUT -->
+<div class="main">
 
-<h3>📋 Все филиалы</h3>
-<div id="list"></div>
+    <!-- ЛЕВАЯ ПАНЕЛЬ -->
+    <div class="sidebar">
+
+        <h3>🔥 Проблемы</h3>
+        <div id="problems"></div>
+
+        <h3>📋 Все филиалы</h3>
+        <div id="list"></div>
+
+    </div>
+
+    <!-- ПРАВАЯ ПАНЕЛЬ (ТАБЛИЦА) -->
+    <div class="content">
+        <div id="tableView">
+            <p style="color:#94a3b8">Выбери филиал →</p>
+        </div>
+    </div>
+
+</div>
 
 <script src="/web/js/app.js"></script>
 
