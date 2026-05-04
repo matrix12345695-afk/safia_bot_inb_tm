@@ -96,19 +96,6 @@ select {
 .status.in_progress { color: #f59e0b; }
 .status.overdue { color: #ef4444; }
 
-/* таблица */
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 10px;
-}
-
-th, td {
-    padding: 6px;
-    border-bottom: 1px solid #334155;
-    text-align: left;
-}
-
 /* кнопка */
 button {
     margin-bottom: 10px;
@@ -118,29 +105,12 @@ button {
     background: #334155;
     color: white;
 }
-/* === Excel стиль === */
-#excelTable table {
-    width: 100%;
-    border-collapse: collapse;
-    background: white;
-    color: black;
-}
 
-#excelTable td, 
-#excelTable th {
-    border: 1px solid #ccc;
-    padding: 6px;
-    font-size: 13px;
-}
-
-#excelTable tr:nth-child(even) {
-    background: #f9f9f9;
-}
 /* =========================
-   🔥 EXCEL UI (УЛУЧШЕННЫЙ)
+   🔥 EXCEL UI (СТАБИЛЬНЫЙ)
 ========================= */
 
-/* контейнер Excel */
+/* контейнер */
 #excelTable {
     overflow: auto;
     max-height: 70vh;
@@ -150,37 +120,38 @@ button {
     padding: 6px;
 }
 
-/* сама таблица */
-#excelTable table,
-.excel-table {
+/* таблица — фикс сетка */
+#excelTable table {
     border-collapse: collapse;
-    width: max-content;
-    min-width: 100%;
-    font-size: 13px;
+    table-layout: fixed; /* 🔥 КЛЮЧЕВОЕ */
+    width: 100%;
     background: white;
     color: black;
+    font-size: 13px;
 }
 
 /* ячейки */
 #excelTable td,
-#excelTable th,
-.excel-table td {
+#excelTable th {
     border: 1px solid #d1d5db;
     padding: 6px;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
     white-space: nowrap;
 }
 
-/* зебра как в Excel */
+/* зебра */
 #excelTable tr:nth-child(even) td {
     background: #f8fafc;
 }
 
-/* hover как в таблицах BI */
+/* hover */
 #excelTable tr:hover td {
     background: #e2e8f0 !important;
 }
 
-/* закреп шапки (если первая строка = заголовок) */
+/* шапка */
 #excelTable tr:first-child td {
     position: sticky;
     top: 0;
@@ -189,7 +160,7 @@ button {
     z-index: 2;
 }
 
-/* скролл красивый */
+/* скролл */
 #excelTable::-webkit-scrollbar {
     height: 10px;
     width: 10px;
