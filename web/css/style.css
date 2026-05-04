@@ -118,3 +118,21 @@ button {
     background: #334155;
     color: white;
 }
+/* === Excel стиль === */
+#excelTable table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    color: black;
+}
+
+#excelTable td, 
+#excelTable th {
+    border: 1px solid #ccc;
+    padding: 6px;
+    font-size: 13px;
+}
+
+#excelTable tr:nth-child(even) {
+    background: #f9f9f9;
+}
