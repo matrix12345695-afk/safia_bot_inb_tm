@@ -140,6 +140,16 @@ function openDetails(index) {
 
     body.innerHTML = html;
 
+    // 🔥 правильное открытие
+    modal.classList.remove("hidden");
+
+    setTimeout(() => {
+        modal.classList.add("show");
+    }, 10);
+}
+
+    body.innerHTML = html;
+
     // 💥 ЖЁСТКИЙ СТАРТ
     modal.classList.remove("hidden");
     modal.offsetHeight; // 🔥 форс рендер
