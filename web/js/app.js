@@ -1,7 +1,8 @@
 let DATA = [];
 let SUMMARY = {};
 
-const API_URL = "https://ТВОЙ-БЭКЕНД.onrender.com"; // ⚠️ ВСТАВЬ СВОЙ backend
+// ⚠️ ВСТАВЬ СВОЙ BACKEND
+const API_URL = window.location.origin;
 
 async function load() {
     try {
@@ -101,7 +102,7 @@ function render(list) {
     });
 }
 
-/* 🔥 ГЛАВНОЕ — Excel через API */
+/* 🔥 НОВАЯ ВЕРСИЯ — ЧИТАЕМ EXCEL */
 async function openDetails(item) {
     const container = document.getElementById("list");
 
@@ -112,7 +113,7 @@ async function openDetails(item) {
     `;
 
     try {
-        const response = await fetch(API_URL + "/excel"); // 👈 backend отдаёт файл
+        const response = await fetch(API_URL + "/excel"); // backend endpoint
         const data = await response.arrayBuffer();
 
         const workbook = XLSX.read(data, {
@@ -120,14 +121,16 @@ async function openDetails(item) {
             cellStyles: true
         });
 
+        // 👉 попробуй 0,1,2 если не тот лист
         const sheet = workbook.Sheets[workbook.SheetNames[0]];
+
         const html = XLSX.utils.sheet_to_html(sheet);
 
         document.getElementById("excelTable").innerHTML = html;
 
     } catch (e) {
-        console.log(e);
-        document.getElementById("excelTable").innerHTML = "Ошибка загрузки Excel";
+        console.log("Excel ошибка:", e);
+        document.getElementById("excelTable").innerHTML = "❌ Ошибка загрузки Excel";
     }
 }
 
