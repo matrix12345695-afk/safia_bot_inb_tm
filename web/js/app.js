@@ -1,9 +1,6 @@
 let DATA = [];
-let SUMMARY = {};
+let SUMMARY = [];
 let currentView = "list";
-
-let isMouseDown = false;
-let selectedCells = [];
 
 // API
 const API_URL = window.location.origin;
@@ -89,7 +86,7 @@ function formatMoney(num) {
     return Number(num).toLocaleString("ru-RU");
 }
 
-/* 🚀 ГЛАВНЫЙ ЭКРАН */
+/* 🚀 СПИСОК ФИЛИАЛОВ */
 function render(list) {
     const container = document.getElementById("list");
     container.innerHTML = "";
@@ -126,13 +123,14 @@ function render(list) {
     });
 }
 
-/* 🔥 ОТКРЫТИЕ ЛИСТА */
+/* 🔥 ОТКРЫТИЕ В МОДАЛКЕ */
 function openDetails(index) {
     currentView = "details";
 
     const item = DATA[index];
 
-    const container = document.getElementById("tableView");
+    const modal = document.getElementById("modal");
+    const body = document.getElementById("modalBody");
 
     let html = `<h3>${item.branch}</h3>`;
 
@@ -142,14 +140,14 @@ function openDetails(index) {
         html += `<div id="excelTable">${item.excel_html}</div>`;
     }
 
-    container.innerHTML = html;
+    body.innerHTML = html;
+    modal.classList.remove("hidden");
 }
 
-/* 🔙 НАЗАД */
-function goBack() {
+/* 🔙 ЗАКРЫТИЕ */
+function closeModal() {
     currentView = "list";
-    load();
-    document.getElementById("tableView").innerHTML = "Выбери филиал →";
+    document.getElementById("modal").classList.add("hidden");
 }
 
 /* ПРОБЛЕМЫ */
