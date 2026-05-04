@@ -1,9 +1,11 @@
 let DATA = [];
 let SUMMARY = {};
 
+const API_URL = "https://ТВОЙ-БЭКЕНД.onrender.com"; // ⚠️ ВСТАВЬ СВОЙ backend
+
 async function load() {
     try {
-        const res = await fetch(window.location.origin + "/dashboard");
+        const res = await fetch(API_URL + "/dashboard");
         const json = await res.json();
 
         DATA = json.items || [];
@@ -99,7 +101,7 @@ function render(list) {
     });
 }
 
-/* ДЕТАЛИ — ПЕРЕПИСАНО ПОЛНОСТЬЮ */
+/* 🔥 ГЛАВНОЕ — Excel через API */
 async function openDetails(item) {
     const container = document.getElementById("list");
 
@@ -110,7 +112,7 @@ async function openDetails(item) {
     `;
 
     try {
-        const response = await fetch("/excel/Май бар №1.xlsm"); // путь к файлу
+        const response = await fetch(API_URL + "/excel"); // 👈 backend отдаёт файл
         const data = await response.arrayBuffer();
 
         const workbook = XLSX.read(data, {
@@ -118,9 +120,7 @@ async function openDetails(item) {
             cellStyles: true
         });
 
-        // ⚠️ если нужный лист не первый — поменяй индекс
         const sheet = workbook.Sheets[workbook.SheetNames[0]];
-
         const html = XLSX.utils.sheet_to_html(sheet);
 
         document.getElementById("excelTable").innerHTML = html;
