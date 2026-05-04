@@ -125,8 +125,6 @@ function render(list) {
 
 /* 🔥 ОТКРЫТИЕ В МОДАЛКЕ */
 function openDetails(index) {
-    currentView = "details";
-
     const item = DATA[index];
 
     const modal = document.getElementById("modal");
@@ -139,6 +137,14 @@ function openDetails(index) {
     } else {
         html += `<div id="excelTable">${item.excel_html}</div>`;
     }
+
+    body.innerHTML = html;
+
+    // 💥 ЖЁСТКИЙ СТАРТ
+    modal.classList.remove("hidden");
+    modal.offsetHeight; // 🔥 форс рендер
+    modal.classList.add("show");
+}
 
     body.innerHTML = html;
 
