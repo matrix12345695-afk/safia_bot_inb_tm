@@ -1,7 +1,7 @@
 let DATA = [];
 let SUMMARY = {};
 
-// ⚠️ ВСТАВЬ СВОЙ BACKEND
+// API
 const API_URL = window.location.origin;
 
 async function load() {
@@ -102,36 +102,20 @@ function render(list) {
     });
 }
 
-/* 🔥 НОВАЯ ВЕРСИЯ — ЧИТАЕМ EXCEL */
-async function openDetails(item) {
+/* 🔥 НОВАЯ ВЕРСИЯ — БЕЗ /excel */
+function openDetails(item) {
     const container = document.getElementById("list");
 
-    container.innerHTML = `
-        <button onclick="load()">← Назад</button>
-        <h3>${item.branch}</h3>
-        <div id="excelTable">Загрузка Excel...</div>
-    `;
+    let html = `<button onclick="load()">← Назад</button>`;
+    html += `<h3>${item.branch}</h3>`;
 
-    try {
-        const response = await fetch(API_URL + "/excel"); // backend endpoint
-        const data = await response.arrayBuffer();
-
-        const workbook = XLSX.read(data, {
-            type: "array",
-            cellStyles: true
-        });
-
-        // 👉 попробуй 0,1,2 если не тот лист
-        const sheet = workbook.Sheets[workbook.SheetNames[0]];
-
-        const html = XLSX.utils.sheet_to_html(sheet);
-
-        document.getElementById("excelTable").innerHTML = html;
-
-    } catch (e) {
-        console.log("Excel ошибка:", e);
-        document.getElementById("excelTable").innerHTML = "❌ Ошибка загрузки Excel";
+    if (!item.excel_html) {
+        html += "<p>Нет данных</p>";
+    } else {
+        html += `<div id="excelTable">${item.excel_html}</div>`;
     }
+
+    container.innerHTML = html;
 }
 
 /* ПРОБЛЕМЫ */
