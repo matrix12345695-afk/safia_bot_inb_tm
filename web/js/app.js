@@ -1,12 +1,11 @@
 let DATA = [];
 let SUMMARY = {};
-let currentView = "list"; // 🔥 фикс состояния
+let currentView = "list";
 
 // API
 const API_URL = window.location.origin;
 
 async function load() {
-    // ❗ НЕ обновляем если открыт лист
     if (currentView !== "list") return;
 
     try {
@@ -81,7 +80,13 @@ function applyFilters() {
     render(filtered);
 }
 
-/* СПИСОК — С КНОПКОЙ */
+/* 💰 ФОРМАТ ДЕНЕГ */
+function formatMoney(num) {
+    if (!num) return "0";
+    return Number(num).toLocaleString("ru-RU");
+}
+
+/* 🚀 ГЛАВНЫЙ ЭКРАН (ПЕРЕДЕЛАН) */
 function render(list) {
     const container = document.getElementById("list");
     container.innerHTML = "";
@@ -90,28 +95,38 @@ function render(list) {
         const div = document.createElement("div");
         div.className = "card";
 
+        const statusColor =
+            item.status === "closed" ? "#22c55e" :
+            item.status === "overdue" ? "#ef4444" :
+            "#f59e0b";
+
         div.innerHTML = `
             <div style="display:flex;justify-content:space-between;align-items:center;">
                 
                 <div>
-                    <div><b>${item.branch}</b></div>
-
-                    <div class="status ${item.status}">
-                        ${item.status_raw || item.status}
+                    <div style="font-size:16px;font-weight:600;">
+                        ${item.branch}
                     </div>
 
-                    <div style="font-size:12px;color:#94a3b8">
+                    <div style="margin-top:4px;color:${statusColor};font-size:13px;">
+                        ● ${item.status_raw || item.status}
+                    </div>
+
+                    <div style="margin-top:6px;font-size:12px;color:#94a3b8;">
                         ${item.accountant || "-"} / ${item.tm || "-"}
-                    </div>
-
-                    <div style="margin-top:4px;font-size:13px;color:#38bdf8">
-                        💰 ${item.total || 0}
                     </div>
                 </div>
 
-                <button onclick='openDetails(${JSON.stringify(item)})'>
-                    Открыть →
-                </button>
+                <div style="text-align:right;">
+                    <div style="font-size:16px;font-weight:bold;color:#38bdf8;">
+                        ${formatMoney(item.total)}
+                    </div>
+
+                    <button style="margin-top:6px"
+                        onclick='openDetails(${JSON.stringify(item)})'>
+                        Открыть →
+                    </button>
+                </div>
 
             </div>
         `;
@@ -122,7 +137,7 @@ function render(list) {
 
 /* 🔥 ДЕТАЛИ */
 function openDetails(item) {
-    currentView = "details"; // ❗ фикс
+    currentView = "details";
 
     const container = document.getElementById("list");
 
